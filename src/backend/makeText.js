@@ -15,4 +15,4 @@ let expFunc = async function (coefficents , callback){
     }
 }
 
-expFunc(['2.57','2.12','1.10'],function(){console.log('OK')});
+module.exports = expFunc;
