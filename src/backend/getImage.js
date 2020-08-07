@@ -9,21 +9,27 @@ var path = require('path');
 
 let expFunc = async function(callback){
     //записываем стек изображений в папку tempImg, предварительно её очистив
-    let paths;
     console.log('get iamges files from ./tempIMG...');
-    await getFiles('./tempIMG/',(err, files) => {
-        if (err) callback(new Error(err));
-        paths = files;
-        console.log(`${paths}`);
-    })
+    let paths = await getFiles('./tempIMG/');
+    console.log(`Finded files: ${paths}`);
+    console.log(`Generate images objects...`);
     let images = [];
     for (let i in paths){
         images.push({sharp: sharp(paths[i])});
         images[i].width = images[i].sharp.metadata().then(function(meta){meta.width});
         images[i].height = images[i].sharp.metadata().then(function(meta){meta.height});
+        images[i].name = path.basename(path[i]);
     }
-
-    callback(null, images);
+    console.log(`Generated objects ${images}`);
+    console.log(`Correcting images size...`);
+    for(let i in images){
+        if(images[i].width > images[i].height){
+            images[i].sharp.resize({width:300}).toFile('./logos/' + images[i].name);
+        }
+        else if (images.width < images.height){
+            images[i].sharp.resize({height:350}).toFile('./logos' + images[i].name)
+        }
+    }
 }
 
  async function getFiles (dirPath) {
@@ -42,4 +48,4 @@ let expFunc = async function(callback){
     return resultArr;
 }
 
-getFiles('./tempIMG/').then(function(data){console.log(data)});
+expFunc();
