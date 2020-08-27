@@ -1,26 +1,26 @@
-let fs = require('fs');
-let pathsToImages;
-let teams = ['РБ Лейпциг','Интер М'];
-console.log('Opening JSON...');
-fs.readFile('./iconsPath.json', 'utf-8', (err, fd) => {
-    let images = [];
-    if (err) throw new Error ('Error of read JSON');
-    console.log(fd);
-    let isChanged = false;
-    console.log('Convert JSON to Object...');
-    pathsToImages = JSON.parse(fd);
-    console.log(pathsToImages);
-    for(i in teams){
-      console.log('Search ' + teams[i] + ' in JSON...');
-      if(Object.keys(pathsToImages).includes(teams[i])){
-        console.log('Team is finded! Take the path of picture...');
-        images[i] = pathsToImages[teams[i]];
-      }
-      else{
-        console.log('Team is not finded! create path...');
-      }
+let fs = require('fs'); //модуль принимает в себя название команд, если логотип для команды имеется, возвращается true, в противном случае возвращается false
+
+let expFunc = async function(teamArr){
+  let promiseArr = [];
+  for(let i = 0; i < 2; i++){
+    promiseArr.push(checkTeam(teamArr[i]));
   }
-  
-console.log(images);
-})
+  return Promise.all(promiseArr);
+}
+
+let checkTeam = async function(team){
+  console.log('Opening JSON...');
+  let iconsObj = await new Promise((resolve,reject) => {
+    fs.readFile('./iconsPath.json', 'utf-8', (err, fd) => {
+      if (err) reject(err);
+      resolve(JSON.parse(fd));
+    });
+  })
+  if (iconsObj.hasOwnProperty(team)) return true;
+  else return false;
+  ;
+}
+
+module.exports = expFunc;
+
 

@@ -1,12 +1,11 @@
 const puppeteer = require('puppeteer');
 //тут мы открываем страницу с матчем и парсим страницу, доставая названия и коэфиценты.
 
-let exportFunc = async function(url,callback){
+let exportFunc = async function(url){
     console.log('start browser...');
     const browser = await puppeteer.launch();
     console.log('open page...');
     const page = await browser.newPage();
- 
     //метод evaulate позволяет взаимодействовать с объектом страницы посредством jquery селекторов
     //на момент написания кода, названия команд отдавалось единой строчкой, отделяясь тире
     //эта строчка звернута в уникальный класс, соответсвенно, достаем эту строчку и разбиваем по командам, ориентеруясь на тире
@@ -28,7 +27,7 @@ let exportFunc = async function(url,callback){
         })
     console.log(`close browser...`);
     await browser.close();
-    callback(null,matchData);
+    return matchData;
 };
 
 module.exports = exportFunc;

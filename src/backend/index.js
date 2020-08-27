@@ -1,9 +1,11 @@
 let parsMatchPage = require('./parsMatchPage.js');
-new Promise (function(resolve,reject){
-    //получаем данные с сайта
-    parsMatchPage('https://www.olimp.bet/live/1/6537877/59897726',(err,data) => {if (err) new Error(err); else resolve(data)}); 
-}).then((matchData) => {
-    
-})
+let icons = require('./icons.js');
+
+let matchData;
+parsMatchPage('https://www.olimp.bet/line/1/2430428/59915483').then(data => {matchData = data; console.log(matchData); return icons([matchData.firstTeam,matchData.secondTeam])})
+                                                              .then(checkResult => {if(checkResult.includes(false))
+                                                                    askImages(checkResult.map( (elem, index) => {if (elem) return index} ))
+                                                                })
+
 
 
