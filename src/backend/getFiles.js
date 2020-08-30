@@ -1,20 +1,22 @@
 let fs = require('fs');
 let path = require('path');
 
-let getFiles = async function (dirPath,format,callback) {
-    new Promise(function(resolve,reject){
+let getFiles = async function (dirPath,format) {
+    let resultArr = [];
+
+    await new Promise(function(resolve,reject){
         fs.readdir(dirPath, function (err, files) {
             if (err) reject(err);
             resolve(files);
         });
     })
     .then((files) => {
-        let resultArr = [];
-        for (let i in files){
-            if(path.extname(files[i])=='.' + format) resultArr.push(files[i]);
+        for (let i = 0; i < files.length; i++){
+            if(path.extname(files[i]) == '.' + format) resultArr.push(files[i]);
         }
-        callback(null,resultArr);
     })
+    return resultArr;
 }
 
 module.exports = getFiles;
+

@@ -1,60 +1,78 @@
 let sharp = require('sharp'); //для обработки картинок
-
+let getFiles = require('./getFiles');
+let iconPath = require('./iconsPath.json');
 
 
 const backgroundPath = './background/background.png';  //путь до бэкграунда
 const spaceBetweenLogos = 400 //умножить на 2, тк применяется к позиционированнию каждого логотипа
 const exportPath = './final/fead.png';
-const jumpImage = 70 //расстояние на которое приподнимутся логотипы
+const marginImageY = -70 //расстояние на которое приподнимутся логотипы
+const marginCoeffY = 100 //расстояние на которое приподнимутся логотипы
+const logosPath = './logos/';
 
-let createImage = function(teams,coefficents,callback) {
+let images = [];
 
-    //для редактирования картинок, необходимо создать объект sharp, который принимает в себя ссылку до картинки
-    //в получившемся объекте запускаем нужные методы и через метод экспорта получаем нужную картинку
-    //для простоты генерации этих объектов, все пути до картинок складываются в массив и в соотв. порядке генерируется массив объектов sharp
+let expFunc = async function(matchObj){
+    console.log('take coefficents from temp path...');
+    let coefficents = (await getFiles('./coefficents','png')).map(path => {return './coefficents/' + path});
+    let imagesPaths = [].concat(backgroundPath,logosPath + iconPath[matchObj.firstTeam],logosPath + iconPath[matchObj.secondTeam],coefficents);
+    let promises = [];
+    for(let i = 0; i < imagesPaths.length; i++){
+        console.log(`create sharp object for ${imagesPaths[i]}`);
+        images.push({sharp: sharp(imagesPaths[i]), path: imagesPaths[i]}); 
+        promises.push(images[i].sharp.metadata());
+    }
+    await Promise.all(promises).then(arr => {
+        for(let i = 0; i < arr.length; i++){
+            images[i].width = arr[i].width;
+            images[i].height = arr[i].height;
+        }
+    })
+
+    return await createComposition(); 
+}
+
+async function createComposition(){
+    console.log(`Generate composition...`);
+    let background_halfWidth = images[0].width / 2; 
+    let background_halfHeight = images[0].height / 2;
+    let composition =  [{input: images[1].path, left: Math.floor((background_halfWidth - images[1].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight - images[1].height / 2 + marginImageY)},
+                        {input: images[2].path, left: Math.floor((background_halfWidth - images[2].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight - images[2].height / 2 + marginImageY)},
+                        {input: images[3].path, left: Math.floor((background_halfWidth - images[3].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight + images[3].height / 2 + marginCoeffY)},
+                        {input: images[4].path, left: Math.floor((background_halfWidth - images[4].width / 2)), top: Math.floor(background_halfHeight + images[4].height / 2 + marginCoeffY)},
+                        {input: images[5].path, left: Math.floor((background_halfWidth - images[5].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight + images[5].height / 2 + marginCoeffY)}]            
+    images[0].sharp.composite(composition).toFile(exportPath);
+    return exportPath;  
+}
+
+// let createImage = function(teams,coefficents,callback) {
+
+//     //для редактирования картинок, необходимо создать объект sharp, который принимает в себя ссылку до картинки
+//     //в получившемся объекте запускаем нужные методы редоктирования исходной картинки, а затем через метод экспорта получаем нужную картинку
+//     //для простоты генерации этих объектов, все пути до картинок складываются в массив и в соотв. порядке генерируется массив объектов sharp
     
-
-    console.log(`Get size of images...`);
-    //проходим по объектам и методом metadata получаем размеры картинки;
-    new Promise ((resolve,reject) => {
-        console.log('Generating objects for images...');
-        let paths = Array.prototype.concat(backgroundPath, teams, coefficents);
-        console.log(`Create sharp objects...`);
-        let images = [];
-        for(let i in paths){
-            images.push({sharp: sharp(paths[i]), path: paths[i]}); 
-        }
-        let promises = [];
-        for (let i in images){
-           let promise = new Promise ((resolve,reject) => {
-               images[i].sharp.metadata().then(function(meta){
-                    images[i].width = meta.width;
-                    images[i].height = meta.height;
-                    console.log(images[i]);
-                    resolve();
-               })
-           })
-           promises.push(promise);
-        }
-        Promise.all(promises).then((asdasd) => {resolve(images)});
-    })
-    .then(function(images){
-        return new Promise ((resolve,reject) => {
-            console.log(`Generate composition...`);
-            let background_halfWidth = images[0].width / 2;
-            let background_halfHeight = images[0].height / 2;
-            let composition =  [{input: images[1].path, left: Math.floor((background_halfWidth - images[1].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight - images[1].height / 2 - jumpImage)},
-                                {input: images[2].path, left: Math.floor((background_halfWidth - images[2].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight - images[2].height / 2 - jumpImage)},
-                                {input: images[3].path, letft}]
-            
-            images[0].sharp.composite(composition).toFile(exportPath,callback(null,`OK`));               
-        })
-    })
+//     //проходим по объектам и методом metadata получаем размеры картинки;
+//     new Promise ((resolve,reject) => {
+//         console.log('Generating objects for images...');
+//         console.log(`Create sharp objects...`);romises = [];
+//         for (let i in images){
+//            let promise = new Promise ((resolve,reject) => {
+//                images[i].sharp.metadata().then(function(meta){
+//                     images[i].width = meta.width;
+//                     images[i].height = meta.height;
+//                     console.log(images[i]);
+//                     resolve();
+//                })
+//            })
+//            promises.push(promise);
+//         }
+//         Promise.all(promises).then((asdasd) => {resolve(images)});
+//     })
+//     .then(function(images){
+             
+//         })
+//     })
   
-}
-let cb = (err,data) => {
-    console.log(data);
-}
-function
+// }
 
-createImage(['./logos/3c5745b91649d6f7352f65c3b4f109af.png','./logos/e3f06b7ac1fdff71b83f59c2902d6610.png'],['./coefficents/coeff0.png','./coefficents/coeff1.png','./coefficents/coeff2.png'], cb);
+module.exports = expFunc;
