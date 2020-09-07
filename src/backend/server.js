@@ -1,5 +1,7 @@
 let http = require('http');
 let fs = require('fs');
+const formidable = require('formidable');
+
 
 let server = http.createServer((req,res) => {
       switch(req.method){
@@ -17,7 +19,12 @@ function handleGET(req,res){
 }
 
 function handlePOST(req,res){
-  
+  const form = formidable({ multiples: true });
+  form.parse(req, (err,fields,files) => {
+    console.log(files);
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('OK');
+  })
 }
 
 
