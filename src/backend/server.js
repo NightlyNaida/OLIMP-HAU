@@ -22,12 +22,15 @@ function handleGET(req,res){
 function handlePOST(req,res){
   const form = formidable({ multiples: true });
   form.parse(req, (err,fields,files) => {
-    oldPath = files.image.path;
-    newPath = './logos';
-    fs.rename(oldPath,newPath,(err) => {
+    console.log(files.image.path);
+    oldPath = `${files.image.path}`;
+    newPath = './logos/newLogo.png';
+    fs.copyFile(oldPath,newPath,(err) => {
       if (err) {
+        console.log(err);
         res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end('err'); 
+        res.end('err');
+        return; 
       }
 
       res.writeHead(200, {'Content-Type': 'text/plain'});
