@@ -22,8 +22,8 @@ $.path.tasks.forEach(function (taskPath) {
 
 $.gulp.task('default', $.gulp.series(
     $.gulp.series('images','svg','fonts'),
-    $.gulp.parallel('pug','stylus','scripts-ex','script'),
-    $.gulp.parallel('watch','serve')  
+    $.gulp.parallel('pug','stylus','script'),
+    $.gulp.parallel('watch')  
 ));
 
  /*$.gulp.task('getIamges', function(callback){

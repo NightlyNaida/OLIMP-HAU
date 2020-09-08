@@ -9,21 +9,30 @@ let server = http.createServer((req,res) => {
         case 'GET': handleGET(req,res); break;
       }
     }
-).listen(3000, () => console.log('Server strat listening port 3000'));
+).listen(3030, () => console.log('Server strat listening port 3000'));
 
 function handleGET(req,res){
   switch(req.url){
     case'/': giveIndexPage(res); break;
-    default : give404Page(res);
+    case'/script.js': giveScript(res); break;
+    default : give404Page(res); break;
   }
 }
 
 function handlePOST(req,res){
   const form = formidable({ multiples: true });
   form.parse(req, (err,fields,files) => {
-    console.log(files);
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('OK');
+    oldPath = files.image.path;
+    newPath = './logos';
+    fs.rename(oldPath,newPath,(err) => {
+      if (err) {
+        res.writeHead(400, {'Content-Type': 'text/plain'});
+        res.end('err'); 
+      }
+
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.end('OK');
+    })
   })
 }
 
@@ -37,4 +46,10 @@ function giveIndexPage(res){
 function give404Page(res){
   res.writeHead(404,{'Content-Type': 'text/plain'});
   res.end('404 Not Found');
+}
+
+async function giveScript(res){
+  let script =  await new Promise((resolve,reject) => {fs.readFile('../../build/script.js','utf-8', (err, data) => resolve(data))});
+  res.writeHead(200,{'Content-Type' : 'application/javascript'});
+  res.end(script);
 }
