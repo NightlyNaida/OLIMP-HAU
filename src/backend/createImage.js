@@ -1,13 +1,13 @@
 let sharp = require('sharp'); //для обработки картинок
-let getFiles = require('./getFiles');
-let iconPath = require('./iconsPath.json');
+let getFiles = require('./getFiles'); //модуль для загрузки файлов
+let iconPath = require('./iconsPath.json'); //список, хранящий пути до логотипов команд
 
 
 const backgroundPath = './background/background.png';  //путь до бэкграунда
 const spaceBetweenLogos = 400 //умножить на 2, тк применяется к позиционированнию каждого логотипа
-const exportPath = './final/fead.png';
+const exportPath = './final/head.png';
 const marginImageY = -70 //расстояние на которое приподнимутся логотипы
-const marginCoeffY = 100 //расстояние на которое приподнимутся логотипы
+const marginCoeffY = 100 //расстояние на которое приподнимутся коэффиценты
 const logosPath = './logos/';
 
 let images = [];
@@ -41,7 +41,7 @@ async function createComposition(){
                         {input: images[3].path, left: Math.floor((background_halfWidth - images[3].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight + images[3].height / 2 + marginCoeffY)},
                         {input: images[4].path, left: Math.floor((background_halfWidth - images[4].width / 2)), top: Math.floor(background_halfHeight + images[4].height / 2 + marginCoeffY)},
                         {input: images[5].path, left: Math.floor((background_halfWidth - images[5].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight + images[5].height / 2 + marginCoeffY)}]            
-    images[0].sharp.composite(composition).toFile(exportPath);
+    await images[0].sharp.composite(composition).toFile(exportPath);
     return exportPath;  
 }
 

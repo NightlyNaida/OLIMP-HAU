@@ -23,7 +23,7 @@ let exportFunc = async function(url){
                 for(let i = 0; i < 3; i++){
                     coeff.push(spans[i].textContent); 
                 }
-            return {'firstTeam': firstTeam,'secondTeam': secondTeam,'coeff':coeff}
+            return {'firstTeam': firstTeam,'secondTeam': secondTeam,'coefficents':coeff}
         })
     console.log(`close browser...`);
     await browser.close();

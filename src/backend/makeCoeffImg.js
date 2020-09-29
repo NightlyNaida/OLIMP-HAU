@@ -13,14 +13,14 @@ let expFunc = async function (coefficents){
             promises.push(createCoeffImg(coefficents[i], i));
         }
         await Promise.all(promises);
-        return 'Coefficents successful created!';
+        return true;
     }
-    else throw new Error(`Varible 'coeffcents' is not an Array`);
+    else throw new Error(`Varible 'coefficents' is not an Array`);
 }
 
 async function createCoeffImg (coeff,index){
     console.log(`Converting coefficent ${coeff} into png...`);
-    let file = text2png(coeff,{color: 'black', font: '75px Intro-Black', localFontPath:FONT_PATH, localFontName:'Intro-Black'});
+    let file = text2png(coeff.toString(),{color: 'black', font: '75px Intro-Black', localFontPath:FONT_PATH, localFontName:'Intro-Black'});
     console.log(`writing file...`);
     await writeFile(`${IMG_PATH}coeff${index}.png`,file);
     return true;

@@ -4,7 +4,10 @@ html(lang="ru")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Olimp HAU
     body
-        form#image-send-form
-            input(type="file", name="image")
-            input(type="submit", value="Отправить")
-            script(src="script.js")
+    h1 Olimp HAU
+    .headerResponser
+        form#headerResponser__form()
+            label(for="url") Ссылка на линию
+                input(type="url", name="url" class='headerResponser__url')
+            input(type="submit", value="Отправить" class='headerResponser__submit')
+    script(src="script.js")
