@@ -5,12 +5,15 @@ let app = express();
 let headerMaker = require('./headerMaker');
 
 const formidable = require('formidable');
+const PORT = 3000;
+CONST_PATH_TO_FRONT = '../frontend';
 
 
-app.listen(3030, () => console.log('Server strat listening port 3030'));
+app.listen(PORT, () => console.log(`Server strat listening port ${PORT}`));
 
 app.get('/',(req,res) => giveIndexPage(res));
 app.get('/script.js', (req,res) => giveScript(res));
+//app.get('/style.css', (req,res) => giveStyle(res));
 app.post('/createImage', (req,res) => lauchHeaderMaker(req ,res));
 
 async function lauchHeaderMaker(req,res){
@@ -47,11 +50,17 @@ function handlePOST(req,res){
 }
 
 function giveIndexPage(res){
-  let page = fs.readFileSync('../../build/index.html','utf-8');
+  let page = fs.readFileSync(`${CONST_PATH_TO_FRONT}/index.html`,'utf-8');
   res.status(200);
   res.set({'Content-Type' : 'text/html'});
   res.send(page);
   res.end();
+}
+
+async function giveStyle(res){
+  let css = await 
+  res.status(200);
+  
 }
 
 function give404Page(res){
@@ -60,9 +69,19 @@ function give404Page(res){
 }
 
 async function giveScript(res){
-  let script =  await new Promise((resolve,reject) => {fs.readFile('../../build/script.js','utf-8', (err, data) => resolve(data))});
+  let script =  await new Promise((resolve,reject) => {fs.readFile(`${CONST_PATH_TO_FRONT}/script.js`,'utf-8', (err, data) => resolve(data))});
   res.writeHead(200,{'Content-Type' : 'application/javascript'});
   res.end(script);
+}
+
+async function giveFile(path){
+  let file = await new Promise ((resolve,reject) => {
+    fs.readFile(path,(err,data) => {
+      if(err){reject(err)}
+      resolve(err);
+    })
+  }).catch(err => {throw new Error(err)});
+  return file;
 }
 
 // const form = formidable({ multiples: true });

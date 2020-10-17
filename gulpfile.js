@@ -21,6 +21,7 @@ $.path.tasks.forEach(function (taskPath) {
 });
 
 $.gulp.task('default', $.gulp.series(
+    $.gulp.series('backend'),
     $.gulp.series('images','svg','fonts'),
     $.gulp.parallel('pug','stylus','script'),
     $.gulp.parallel('watch')  
@@ -30,6 +31,7 @@ $.gulp.task('default', $.gulp.series(
    var fs = require("fs");
     var files =  fs.readdirSync("src/img/");
     console.log(files);
+    
     callback();
 })*/
 

@@ -1,6 +1,8 @@
+let PATHS = require('./const.js');
+
 module.exports = function(){
     $.gulp.task('stylus',function () {
-        return $.gulp.src('src/frontend/stylus/style.styl',{allowEmpty:true})
+        return $.gulp.src(`${PATHS.srcFrontPath}/stylus/style.styl`,{allowEmpty:true})
         .pipe($.sourcemaps.init())
         .pipe($.stylus({
             'include css': true
@@ -11,6 +13,6 @@ module.exports = function(){
         .pipe($.csso({  
         }))
         .pipe($.sourcemaps.write())
-        .pipe($.gulp.dest('build'))
+        .pipe($.gulp.dest(PATHS.frontPath))
     });
 }

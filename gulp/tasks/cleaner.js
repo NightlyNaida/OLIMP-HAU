@@ -1,3 +1,5 @@
+let PATHS = require('./const.js');
+
 module.exports = function(){
     $.gulp.task('cleaner-img',function(callback){
         var src = $.gulp.src(['build/img/*'], {read:false, allowEmpty: true})

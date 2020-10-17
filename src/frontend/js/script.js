@@ -16,19 +16,22 @@ form.addEventListener('submit', async (event) => {
 //идентификатор формы определен в коде бэкэнда
 function setListenerToDownloadedForm(){
     let inputs = Array.from(document.querySelectorAll('.needLogoForm__input'));
-    inputs.forEach(input => input.addEventListener('change' , handleInput()));
+    console.log(inputs);
+    inputs.forEach(input => input.addEventListener('change', (event) => {
+        handleInput(event.target);
+    }));
 
-    function handleInput(){
-        if (this.files[0]) {
-            let input = this;
+    function handleInput(input){
+        if (input.files[0]) {
             let fr = new FileReader(); 
             fr.addEventListener('loadend', () => {
                 let img = document.createElement('img');
-                img.src = this.result;
+                img.src = fr.result;
+                img.setAttribute('style',"max-width: 200px; max-height: 200px;");
                 let inputContainer = input.closest('.needLogoForm__inputContainer');
                 inputContainer.appendChild(img);
             })
-            fr.readAsDataURL(this.files[0]);
+            fr.readAsDataURL(input.files[0]);
         }        
     }
 }
@@ -41,7 +44,7 @@ async function getImageThenInsertIt(res){
 
 function insertImageIntoPage(blob){
     let body = document.querySelector('body');
-    body.innerHTML = body.innerHTML + ' <img src="" id="image-place" style="max-width: 100%;">';
+    body.innerHTML = body.innerHTML + ' <img src="" id="image-place" style="max-width: 200px; max-height: 200px;">';
     let imagePlace = document.querySelector('#image-place');
     imagePlace.src = URL.createObjectURL(blob);
 }

@@ -1,12 +1,14 @@
+let PATHS = require('./const.js');
+
 module.exports = function(){
     $.gulp.task('scripts-ex',function () {
-        return $.gulp.src(['node_modules/jquery/dist/jquery.min.js'])//массив при условии, что будет добавлена сторонняя библиотека
+        return $.gulp.src([])//массив при условии, что будет добавлена сторонняя библиотека
         .pipe($.concat('libs.min.js'))
-        .pipe($.gulp.dest('build'))
+        .pipe($.gulp.dest(PATHS.frontPath))
     });
 
     $.gulp.task('script',function () {
-        return $.gulp.src('src/frontend/js/*.js')
-        .pipe($.gulp.dest('build'))
+        return $.gulp.src(`${PATHS.srcFrontPath}/js/*.js`)
+        .pipe($.gulp.dest(PATHS.frontPath))
     });
 }

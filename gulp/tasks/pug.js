@@ -1,10 +1,12 @@
+let PATHS = require('./const.js');
+
 module.exports = function(){
     $.gulp.task('pug',function () {
-        return $.gulp.src('src/frontend/pug/*.pug')
+        return $.gulp.src(`${PATHS.srcFrontPath}/pug/*.pug`)
         .pipe($.pug({
             pretty:true
         }))
-        .pipe($.gulp.dest('build'))
+        .pipe($.gulp.dest(PATHS.frontPath));
     });
     
 }
