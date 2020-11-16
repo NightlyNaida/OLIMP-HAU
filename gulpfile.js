@@ -11,6 +11,7 @@ global.$ = {
     browserSync: require('browser-sync').create(),
     concat: require('gulp-concat'),
     cleaner: require('gulp-clean'),
+    nodemon: require('nodemon'),
     path: {
         tasks: require('./gulp/config/tasks.js')
     }
@@ -23,7 +24,7 @@ $.path.tasks.forEach(function (taskPath) {
 $.gulp.task('default', $.gulp.series(
     $.gulp.series('backend'),
     $.gulp.series('images','svg','fonts'),
-    $.gulp.parallel('pug','stylus','script'),
+    $.gulp.parallel('html','stylus','script'),
     $.gulp.parallel('watch')  
 ));
 

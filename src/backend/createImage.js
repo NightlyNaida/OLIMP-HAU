@@ -1,78 +1,73 @@
+//модуль отвечает за непосредственное создание картинки, возвращает путь до сгенерированного файла
+
 let sharp = require('sharp'); //для обработки картинок
-let getFiles = require('./getFiles'); //модуль для загрузки файлов
 let iconPath = require('./iconsPath.json'); //список, хранящий пути до логотипов команд
+let headConst = require('./headConst.js'); //параметры размещения объектов в шапке
+let text2png = require('text2png');
+const { head } = require('needle');
 
 
-const backgroundPath = './background/background.png';  //путь до бэкграунда
-const spaceBetweenLogos = 400 //умножить на 2, тк применяется к позиционированнию каждого логотипа
-const exportPath = './final/head.png';
-const marginImageY = -70 //расстояние на которое приподнимутся логотипы
-const marginCoeffY = 100 //расстояние на которое приподнимутся коэффиценты
-const logosPath = './logos/';
 
-let images = [];
+const BACKGROUND_PATH = './background/background.png';  //путь до бэкграунда//умножить на 2, тк применяется к позиционированнию каждого логотипа
+const EXPORT_PATH = './finalHead/head.png';
+const MARGIN_COEFF_Y = headConst.marginCoeffY; //расстояние на которое приподнимутся коэффиценты
+const LOGO_PATH = './logos/';
+const FONT_PATH = './fonts/Intro-Black.otf';
+
 
 let expFunc = async function(matchObj){
-    console.log('take coefficents from temp path...');
-    let coefficents = (await getFiles('./coefficents','png')).map(path => {return './coefficents/' + path});
-    let imagesPaths = [].concat(backgroundPath,logosPath + iconPath[matchObj.firstTeam],logosPath + iconPath[matchObj.secondTeam],coefficents);
-    let promises = [];
-    for(let i = 0; i < imagesPaths.length; i++){
-        console.log(`create sharp object for ${imagesPaths[i]}`);
-        images.push({sharp: sharp(imagesPaths[i]), path: imagesPaths[i]}); 
-        promises.push(images[i].sharp.metadata());
-    }
-    await Promise.all(promises).then(arr => {
-        for(let i = 0; i < arr.length; i++){
-            images[i].width = arr[i].width;
-            images[i].height = arr[i].height;
-        }
-    })
+    console.log('create image file');
 
-    return await createComposition(); 
-}
-
-async function createComposition(){
-    console.log(`Generate composition...`);
-    let background_halfWidth = images[0].width / 2; 
-    let background_halfHeight = images[0].height / 2;
-    let composition =  [{input: images[1].path, left: Math.floor((background_halfWidth - images[1].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight - images[1].height / 2 + marginImageY)},
-                        {input: images[2].path, left: Math.floor((background_halfWidth - images[2].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight - images[2].height / 2 + marginImageY)},
-                        {input: images[3].path, left: Math.floor((background_halfWidth - images[3].width / 2) - spaceBetweenLogos), top: Math.floor(background_halfHeight + images[3].height / 2 + marginCoeffY)},
-                        {input: images[4].path, left: Math.floor((background_halfWidth - images[4].width / 2)), top: Math.floor(background_halfHeight + images[4].height / 2 + marginCoeffY)},
-                        {input: images[5].path, left: Math.floor((background_halfWidth - images[5].width / 2) + spaceBetweenLogos), top: Math.floor(background_halfHeight + images[5].height / 2 + marginCoeffY)}]            
-    await images[0].sharp.composite(composition).toFile(exportPath);
-    return exportPath;  
-}
-
-// let createImage = function(teams,coefficents,callback) {
-
-//     //для редактирования картинок, необходимо создать объект sharp, который принимает в себя ссылку до картинки
-//     //в получившемся объекте запускаем нужные методы редоктирования исходной картинки, а затем через метод экспорта получаем нужную картинку
-//     //для простоты генерации этих объектов, все пути до картинок складываются в массив и в соотв. порядке генерируется массив объектов sharp
+    let firstTeamParam = iconPath[matchObj.firstTeam]; //получаем параметры логотипов команд
+    let secondTeamParam = iconPath[matchObj.secondTeam];
     
-//     //проходим по объектам и методом metadata получаем размеры картинки;
-//     new Promise ((resolve,reject) => {
-//         console.log('Generating objects for images...');
-//         console.log(`Create sharp objects...`);romises = [];
-//         for (let i in images){
-//            let promise = new Promise ((resolve,reject) => {
-//                images[i].sharp.metadata().then(function(meta){
-//                     images[i].width = meta.width;
-//                     images[i].height = meta.height;
-//                     console.log(images[i]);
-//                     resolve();
-//                })
-//            })
-//            promises.push(promise);
-//         }
-//         Promise.all(promises).then((asdasd) => {resolve(images)});
-//     })
-//     .then(function(images){
-             
-//         })
-//     })
-  
-// }
+    //далле создаем sharp объекты c каждой составной частью изображения.
+    //в пару sharp'у создаем результат функции sharp, чтобы иметь быстрый и удобный доступ к раpмерам составных частей
+    //размеры логотипов заранее прописаны файле параметров, поэтому для логотипа, мы не вызываем метод metadata, а просто дергаем параметры из JSON файла
+    
+    let background = {
+        sharp: sharp(BACKGROUND_PATH),
+    }
+    background.meta = await background.sharp.metadata();
+
+    let firstTeamImage = sharp(LOGO_PATH + firstTeamParam.name);
+    let secondTeamImage = sharp(LOGO_PATH + secondTeamParam.name);
+
+    let winOfFirst = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[0]))};
+    winOfFirst.meta = await winOfFirst.sharp.metadata();
+
+    let draw = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[1]))};
+    draw.meta = await draw.sharp.metadata();
+
+    let winOfSecond= {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[2]))};
+    winOfSecond.meta = await winOfSecond.sharp.metadata();
+       console.log(`Generate composition...`);
+
+    //тут составляем массив из объектов, чтобы скормить его методу composite
+    let composition =  [{   input: await firstTeamImage.resize({width: firstTeamParam.width, height: firstTeamParam.height}).toBuffer(), 
+                            left: Math.floor(background.meta.width / 2 - headConst.distanceFromCenter - firstTeamParam.width / 2),
+                            top: Math.floor(background.meta.height / 2 - firstTeamParam.height / 2 + headConst.marginLogoY)},
+                        {   input: await secondTeamImage.resize({width: secondTeamParam.width, height: secondTeamParam.height}).toBuffer(), 
+                            left: Math.floor(background.meta.width / 2 + headConst.distanceFromCenter - secondTeamParam.width / 2),
+                            top: Math.floor(background.meta.height / 2 - secondTeamParam.height / 2 + headConst.marginLogoY)},
+                        {   input: await winOfFirst.sharp.toBuffer(), 
+                            left: Math.floor(background.meta.width / 2 - winOfFirst.meta.width / 2) - headConst.distanceFromCenter, 
+                            top: Math.floor(background.meta.height / 2 +  winOfFirst.meta.height / 2) + MARGIN_COEFF_Y},
+                        {   input: await draw.sharp.toBuffer(), 
+                            left: Math.floor(background.meta.width / 2 - draw.meta.width / 2), 
+                            top: Math.floor(background.meta.height / 2 + draw.meta.height / 2) + MARGIN_COEFF_Y},
+                        {   input: await winOfSecond.sharp.toBuffer(), 
+                            left: Math.floor(background.meta.width / 2 - winOfSecond.meta.width / 2) + headConst.distanceFromCenter, 
+                            top: Math.floor(background.meta.height / 2 + winOfSecond.meta.height / 2) + MARGIN_COEFF_Y}];
+
+    console.log(composition);
+    return await background.sharp.composite(composition).png().toBuffer(); //вызываем метод у картинки бэкграунда, т.к. метод накладывает составные части поверх картинки, на которой он вызывается
+}
+
+
+//конвертируем текст в картинку
+function generateImageOfCoefficent(coeff){
+    return text2png(coeff.toString(),{color: 'black', font: '75px Intro-Black', localFontPath:FONT_PATH, localFontName:'Intro-Black'});
+}
 
 module.exports = expFunc;

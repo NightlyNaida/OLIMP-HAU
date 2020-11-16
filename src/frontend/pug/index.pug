@@ -5,11 +5,14 @@ html(lang="ru")
         title Olimp HAU
         link(href="https://fonts.googleapis.com/css2?family=Manjari:wght@100;400&display=swap" rel="stylesheet") 
         link(rel="stylesheet", href="style.css")
+        <script src="https://unpkg.com/vue@3"></script>
     body
-    h1 Olimp HAU
-    .headerResponser
-        form#headerResponser__form()
-            label(for="url") Ссылка на линию
-                input(type="url", name="url" class='headerResponser__url')
-            input(type="submit", value="Отправить" class='headerResponser__submit')
-    script(src="script.js")
+        .app
+
+
+    //- //- .headerResponser
+    //- //-     form#headerResponser__form()
+    //- //-         label(for="url") Ссылка на линию
+    //- //-             input(type="url", name="url" class='headerResponser__url')
+    //- //-         input(type="submit", value="Отправить" class='headerResponser__submit')
+    script(src="script.js" type="module")

@@ -14,7 +14,7 @@
   ],
   "devDependencies": {
     "bootstrap-4-stylus": "^1.0.7",
-    "browser-sync": "^2.26.7",
+    "browser-sync": "^2.26.13",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.0",
     "gulp-clean": "^0.4.0",
@@ -28,7 +28,8 @@
     "gulp-svg-sprite": "^1.5.0"
   },
   "dependencies": {
-    "jquery": "^3.4.1"
+    "jquery": "^3.5.1",
+    "nodemon": "^2.0.5"
   },
   "repository": {
     "type": "git",

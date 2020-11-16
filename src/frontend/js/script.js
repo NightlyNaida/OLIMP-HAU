@@ -1,38 +1,45 @@
+'use strict';
 let form = document.querySelector('#headerResponser__form');
+
+import {initLogo, generateConstructor, generateInputsForConstructor} from '/headerConstructor.js';
+import {processLogoUnavailability} from '/processLogoUnavailability.js';
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    console.log(new FormData(form));
     let res = await fetch('/createImage',{
-        method: 'POST',
+        method: 'GET',
         body: new FormData(form)
-    })
+    });
     let contentType = res.headers.get('Content-Type'); 
-    if(/text\/html/gm.test(contentType)) {getFormAndInsertIt(res).then(ok => setListenerToDownloadedForm())};
+    if(/application\/json/gm.test(contentType)) {proscessResponseAboutNeedForLogo(res).then(ok => setListenerToForm())};
     if(/image\/png/gm.test(contentType)) getImageThenInsertIt(res);
-    // .then(html => document.querySelector('body').innerHTML += html)
 });
 
 
 //идентификатор формы определен в коде бэкэнда
-function setListenerToDownloadedForm(){
+function setListenerToForm(){
     let inputs = Array.from(document.querySelectorAll('.needLogoForm__input'));
-    console.log(inputs);
     inputs.forEach(input => input.addEventListener('change', (event) => {
         handleInput(event.target);
     }));
 
-    function handleInput(input){
+    async function handleInput(input){
         if (input.files[0]) {
-            let fr = new FileReader(); 
-            fr.addEventListener('loadend', () => {
-                let img = document.createElement('img');
-                img.src = fr.result;
-                img.setAttribute('style',"max-width: 200px; max-height: 200px;");
-                let inputContainer = input.closest('.needLogoForm__inputContainer');
-                inputContainer.appendChild(img);
-            })
+            let constructor = await generateConstructor();
+            let inputs = generateInputsForConstructor(input.closest('form').id); //передаём id формы, чтобы привязать инпуты
+            let container = input.closest('.needLogoFormContainer');
+            container.append(constructor);
+            container.append(inputs);
+
+            let fr = new FileReader();
+            fr.addEventListener('loadend', handleReader);
             fr.readAsDataURL(input.files[0]);
-        }        
+        }
+
+        async function handleReader(e){
+            await initLogo(e.target.result);
+        } 
     }
 }
 
@@ -44,22 +51,20 @@ async function getImageThenInsertIt(res){
 
 function insertImageIntoPage(blob){
     let body = document.querySelector('body');
-    body.innerHTML = body.innerHTML + ' <img src="" id="image-place" style="max-width: 200px; max-height: 200px;">';
+    body.innerHTML = body.innerHTML + ' <img src="" id="image-place" style="max-width: 900px; max-height: 200px;">';
     let imagePlace = document.querySelector('#image-place');
     imagePlace.src = URL.createObjectURL(blob);
 }
 
 
-async function getFormAndInsertIt (res){
-    let code = await res.text();
-    insertFormIntoPage(code);
+async function proscessResponseAboutNeedForLogo (res){
+    let jsonText = await res.text();
+    let json = JSON.parse(jsonText);
+    console.log(json);
+    processLogoUnavailability(json);
     return 'OK';
 }
 
-function insertFormIntoPage(code){
-    let body = document.querySelector('body');
-    body.innerHTML = body.innerHTML + code;
-}
 
 
 

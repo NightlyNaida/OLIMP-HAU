@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const user_agents = require('user-agents');
 //тут мы открываем страницу с матчем и парсим страницу, доставая названия и коэфиценты.
 
 let exportFunc = async function(url){
@@ -13,7 +14,8 @@ let exportFunc = async function(url){
     //на сайте отдается множество коэфицентов, у всех них одинаковая сигнатура вложенности, так что здесь ориентир на порядок.
     //первые три коэффицента - П1 Х П2 
     console.log('go to ' + url);
-    await page.goto(url); 
+    await page.goto(url).catch(err => console.log(err)); 
+    await page.waitFor('span.info__text');
     let matchData = await page.evaluate(() => {
             let teams = document.querySelector('span.info__text').textContent;
             let firstTeam = teams.substring(0,teams.indexOf(' -'));
@@ -25,6 +27,7 @@ let exportFunc = async function(url){
                 }
             return {'firstTeam': firstTeam,'secondTeam': secondTeam,'coefficents':coeff}
         })
+    
     console.log(`close browser...`);
     await browser.close();
     return matchData;
