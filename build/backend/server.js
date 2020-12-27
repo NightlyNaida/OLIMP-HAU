@@ -21,7 +21,7 @@ app.get('/',(res,req) => {
 
 app.get('/createImage', async (req,res) => { //запрос клиента на создание шапки
     console.log('client request head');
-    let mathcObj = await parsMatchPage(req.query.link); //парсим страницу матча
+    let mathcObj = await parsMatchPage(req.query.eventLineURL); //парсим страницу матча
     let checkIcons = await logosAvailableChecker.checkArrayOfTeams([mathcObj.firstTeam, mathcObj.secondTeam]); //проверяем наличие иконок
     if(checkIcons.globalResult){
       let image = await createImage(mathcObj); //если иконки есть, делаем шапку и отправляем её
@@ -35,14 +35,15 @@ app.get('/createImage', async (req,res) => { //запрос клиента на 
 });
 
 app.post('/sendLogo', async (req,res) => { //клиент присылает новый логотип
-  console.log('client send new logo')
+  console.log('client send new logo');
   let form = await parseForm(req);
   await processIncomingImage(form)
-  .then(ok =>{
-    sendResponse(res,'Лого сохранен', 'text/plain');
+  .then(status => {
+    if (status) sendResponse(res,'New logo saved', 'text/plain');
+    else sendResponse(res,`Module "processIncomingImage" dosen't work correct`, 'text/plain');
   })
   .catch(err => {
-    sendResponseError(res,err);
+    sendResponseError(res,err.toString());
   });
 })
 
