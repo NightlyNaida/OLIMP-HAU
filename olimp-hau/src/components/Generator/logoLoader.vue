@@ -17,7 +17,9 @@
         </button>
       </div>
       <div v-if="backgroundImageUrl.length > 1" class="image-container">
-        <div class="image-container-scale" :style="scaleOfCompositionStyle">
+        <div ref="background" class="image-container-scale" :style="scaleOfCompositionStyle">
+          <!-- <img class="image-container-scale__logo" :src='activeTeam.file.name' alt=""> -->
+          <div :style="logoPositionStyle" class="image-container-scale__logo"></div>
           <img :src="backgroundImageUrl" alt="Не удалось загрузить изображение шапки">
         </div>
         <div class="imageScaleController">
@@ -49,7 +51,10 @@ export default {
       scaleOfComposition: 20,
       markerPositionId: '',
       backgroundImageUrl: '',
-      isLoadingIamge: false
+      isLoadingIamge: false,
+      logoParameters:{
+        loaded: false
+      }
     }
   },
   props: ['teams'],
@@ -79,6 +84,24 @@ export default {
         })
     },
 
+    getHeaderParemeters(){
+      let thisData = this;
+      workWithServer.getDataFromServerInObject('http://127.0.0.1:3030/headParam')
+        .then(data => {
+          if (data.shortContentType == 'json'){
+            return data.response.text();
+          }
+        })
+        .then(textJSON => {
+          thisData.logoParameters.parameters = JSON.parse(textJSON);
+          thisData.logoParameters.loaded = true;
+        })
+        .catch(err => {
+          //errorMessage
+          console.log(err);
+        })
+    },
+
     buttonScaleControllerClick(e){
       this.changeScaleOfComposition(parseInt(e.currentTarget.dataset.value));
     },
@@ -96,14 +119,26 @@ export default {
 
     inputFileChange(e){
       console.log(this.markerPositionId);
-      if(event.target.files[0]){
-        this.$emit('logo-load',{file: event.target.files[0], name: this.markerPositionId});
+      if(e.target.files[0]){
+        this.$emit('logo-load',{file: e.target.files[0], name: this.markerPositionId});
       }
-    }
+    },
   },
   computed:{
     scaleOfCompositionStyle(){
       return {transform: `scale(${this.scaleOfComposition / 100})`}; 
+    },
+    logoPositionStyle(){
+      console.log(this.$refs.background);
+      // let parentImageStyle = getComputedStyle();
+
+      // let left = parentImageStyle.width / 2 - this.logoParameters.parameters.distanceFromCenter;
+      // let top = parentImageStyle.height / 2 - this.logoParameters.parameters.marginLogoY; 
+      // if(this.logoParameters.loaded){
+      //   return {left: `${left}px`, top: `${top}px`}
+      // }
+      // else return ``;
+      return '';
     }
   },
   mounted(){
@@ -112,6 +147,7 @@ export default {
   created(){
     this.markerPositionId = Object.keys(this.teams)[0];
     this.getBackgroundImageAndWriteIt();
+    this.getHeaderParemeters();
   }
 }
 </script>
@@ -142,6 +178,8 @@ export default {
     padding 0
     transition color .4s ease-in-out
     border-radius 30px
+    overflow hidden
+    text-overflow ellipsis
 
   .button-switch:hover
     border-color rgba(255,255,255,0.3)
@@ -270,6 +308,12 @@ export default {
     animation-duration 2s
     animation-iteration-count infinite 
     animation-timing-function linear
+
+  .image-container-scale__logo
+    width 300px
+    height 300px
+    position: absolute;
+    background-color black
 
   @keyframes rotate 
       0%

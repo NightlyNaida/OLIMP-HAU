@@ -1,3 +1,4 @@
+const { all } = require('async');
 const puppeteer = require('puppeteer');
 const user_agents = require('user-agents');
 //тут мы открываем страницу с матчем и парсим страницу, доставая названия и коэфиценты.
@@ -14,33 +15,19 @@ let exportFunc = async function(url){
     //на сайте отдается множество коэфицентов, у всех них одинаковая сигнатура вложенности, так что здесь ориентир на порядок.
     //первые три коэффицента - П1 Х П2 
     console.log('go to ' + url);
-    await page.goto(url).catch(err => console.log(err)); 
-    await page.waitFor('.outcome-item');
-    let matchData = await page.evaluate(() => {
+    await page.goto(url,{waitUntil: 'load', timeout: 7000}).catch(err => console.log(err)); 
+    let allMatchData = await page.evaluate(() => {
             let teamsNames = Array.from(document.querySelectorAll('.name'));
-            let spans = Array.from(document.querySelectorAll('button > .container > span'));
-            let coefficients = [];
-            let finalObject = {'firstTeam': teamsNames[0].textContent,'secondTeam': teamsNames[1].textContent,'coefficents':coefficients,'images':undefined};
+            let coefficientsContainers = Array.from(document.querySelectorAll('button > .container'));
+            let coefficents = {};
+            for (let i = 0; i < coefficientsContainers.length; i++){
+                let typeOfBetAndCoefficient = coefficientsContainers[i].innerText.split('\n');
+                coefficents[typeOfBetAndCoefficient[0]] = typeOfBetAndCoefficient[1];
+            }
+            let finalObject = {'firstTeam': teamsNames[0].textContent,'secondTeam': teamsNames[1].textContent,'coefficents':coefficents};
             return finalObject;
-        })
-        .catch(err => {
-            console.error(err);
         });
-    console.log(matchData);
-    console.log(`close browser...`);
     await browser.close();
-    return matchData;
-
-    function parseCoefficents(array){
-        let coefficients = [];
-        for(let i = 0; i < 3; i++){
-            array.push(spans[i].textContent); 
-        }
-        
-        return coefficients;
-    }
+    return allMatchData;
 };
-
-
-
 module.exports = exportFunc;

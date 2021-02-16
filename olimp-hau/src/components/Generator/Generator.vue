@@ -19,8 +19,8 @@ export default {
     addNewTeam(team){
       this.teamsNeedForLogo[team] = {isLoaded: false};
     },
-    addNewLogoToTeam(dataObject){
-      this.teamsNeedForLogo[dataObject.name].file = dataObject.file;
+    addNewLogoToTeam(teamData){
+      this.teamsNeedForLogo[teamData.name].file = teamData.file;
       console.log(this.teamsNeedForLogo);
     },
     deleteTeam(key){

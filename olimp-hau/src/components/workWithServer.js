@@ -7,7 +7,9 @@ async function getDataFromServerInObjectFunction(url){
     let contentType = responseFromServer.headers.get('Content-Type');
     let shortContentType = convertContentTypeToSortVersion(contentType);
 
-    return {'response': responseFromServer, 'contentType': contentType, 'shortContentType': shortContentType}
+    let finalyObject = {'response': responseFromServer, 'contentType': contentType, 'shortContentType': shortContentType};
+
+    return finalyObject;
 
 }
 
