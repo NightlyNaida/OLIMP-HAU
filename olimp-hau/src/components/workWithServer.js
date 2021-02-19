@@ -1,5 +1,7 @@
 let obj = {
     getDataFromServerInObject: getDataFromServerInObjectFunction,
+    getCompositionParametes: getCompositionParametesFunction,
+    getBackgroundImage: getBackgroundImageFunction
 }
 
 async function getDataFromServerInObjectFunction(url){
@@ -17,6 +19,25 @@ function convertContentTypeToSortVersion(contentType){
     if (/image\/png/gm.test(contentType)) return 'png';
     if (/application\/json/gm.test(contentType)) return 'json';
     return null;
+}
+
+async function getCompositionParametesFunction(){
+    let data = await getDataFromServerInObjectFunction('http://127.0.0.1:3030/headParam');
+    if (data.shortContentType == 'json'){
+        let textJSON = await data.text();
+        let json = JSON.parse(textJSON);
+        return json;
+    }
+
+} 
+
+async function getBackgroundImageFunction(){
+    let data = await getDataFromServerInObjectFunction('http://127.0.0.1:3030/testhead?secondTeam=Пусто');
+    if(data.shortContentType == 'png'){
+        let imageBlob = await data.response.blob();
+        let src = URL.createObjectURL(imageBlob);
+        return src;  
+    }
 }
 
 export default obj

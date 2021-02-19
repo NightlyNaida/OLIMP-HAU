@@ -53,7 +53,7 @@ export default {
       backgroundImageUrl: '',
       isLoadingIamge: false,
       logoParameters:{
-        loaded: false
+        
       }
     }
   },
@@ -71,37 +71,6 @@ export default {
       this.$refs['button-' + buttonId].classList.add('button-selected');
       this.$refs[`marker`].style.left = (this.$refs['button-' + buttonId].getBoundingClientRect().left - 70) + 'px';
     },
-    getBackgroundImageAndWriteIt(){
-      let thisData = this;
-      thisData.isLoadingIamge = true;
-      workWithServer.getDataFromServerInObject('http://127.0.0.1:3030/testhead?secondTeam=Пусто')
-        .then(data => {
-          return data.response.blob();
-        })
-        .then(blob =>{
-          thisData.backgroundImageUrl = URL.createObjectURL(blob);
-          thisData.isLoadingIamge = true;
-        })
-    },
-
-    getHeaderParemeters(){
-      let thisData = this;
-      workWithServer.getDataFromServerInObject('http://127.0.0.1:3030/headParam')
-        .then(data => {
-          if (data.shortContentType == 'json'){
-            return data.response.text();
-          }
-        })
-        .then(textJSON => {
-          thisData.logoParameters.parameters = JSON.parse(textJSON);
-          thisData.logoParameters.loaded = true;
-        })
-        .catch(err => {
-          //errorMessage
-          console.log(err);
-        })
-    },
-
     buttonScaleControllerClick(e){
       this.changeScaleOfComposition(parseInt(e.currentTarget.dataset.value));
     },
@@ -127,27 +96,26 @@ export default {
   computed:{
     scaleOfCompositionStyle(){
       return {transform: `scale(${this.scaleOfComposition / 100})`}; 
-    },
-    logoPositionStyle(){
-      console.log(this.$refs.background);
-      // let parentImageStyle = getComputedStyle();
-
-      // let left = parentImageStyle.width / 2 - this.logoParameters.parameters.distanceFromCenter;
-      // let top = parentImageStyle.height / 2 - this.logoParameters.parameters.marginLogoY; 
-      // if(this.logoParameters.loaded){
-      //   return {left: `${left}px`, top: `${top}px`}
-      // }
-      // else return ``;
-      return '';
     }
   },
   mounted(){
+    let thisData = this;
     this.changeMarkerPosition(this.markerPositionId);
+    this.isLoadingIamge = true;
+    workWithServer.getBackgroundЯ тебя Image()
+      .then(url => {
+        console.log(url);
+        thisData.backgroundImageUrl = url;
+        thisData.isLoadingIamge = false;
+      })
+      .catch(err => {
+        //error message 
+        console.error(err);
+        thisData.isLoadingIamge = false;
+      })
   },
   created(){
     this.markerPositionId = Object.keys(this.teams)[0];
-    this.getBackgroundImageAndWriteIt();
-    this.getHeaderParemeters();
   }
 }
 </script>
