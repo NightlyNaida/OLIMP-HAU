@@ -10,7 +10,6 @@ const { head } = require('needle');
 
 const BACKGROUND_PATH = './background/background.png';  //путь до бэкграунда//умножить на 2, тк применяется к позиционированнию каждого логотипа
 const EXPORT_PATH = './finalHead/head.png';
-const MARGIN_COEFF_Y = headConst.marginCoeffY; //расстояние на которое приподнимутся коэффиценты
 const LOGO_PATH = './logos/';
 const FONT_PATH = './fonts/Intro-Black.otf';
 
@@ -45,20 +44,20 @@ let expFunc = async function(matchObj){
 
     //тут составляем массив из объектов, чтобы скормить его методу composite
     let composition =  [{   input: await firstTeamImage.resize({width: firstTeamParam.width, height: firstTeamParam.height}).toBuffer(), 
-                            left: Math.floor(background.meta.width / 2 - headConst.distanceFromCenter - firstTeamParam.width / 2),
-                            top: Math.floor(background.meta.height / 2 - firstTeamParam.height / 2 + headConst.marginLogoY)},
+                            left: Math.floor(background.meta.width / 2 - headConst.distanceFromCenterX - firstTeamParam.width / 2),
+                            top: Math.floor(background.meta.height / 2 - firstTeamParam.height / 2 + headConst.distanceFromCenterY)},
                         {   input: await secondTeamImage.resize({width: secondTeamParam.width, height: secondTeamParam.height}).toBuffer(), 
-                            left: Math.floor(background.meta.width / 2 + headConst.distanceFromCenter - secondTeamParam.width / 2),
-                            top: Math.floor(background.meta.height / 2 - secondTeamParam.height / 2 + headConst.marginLogoY)},
+                            left: Math.floor(background.meta.width / 2 + headConst.distanceFromCenterX - secondTeamParam.width / 2),
+                            top: Math.floor(background.meta.height / 2 - secondTeamParam.height / 2 + headConst.distanceFromCenterY)},
                         {   input: await winOfFirst.sharp.toBuffer(), 
-                            left: Math.floor(background.meta.width / 2 - winOfFirst.meta.width / 2) - headConst.distanceFromCenter, 
-                            top: Math.floor(background.meta.height / 2 +  winOfFirst.meta.height / 2) + MARGIN_COEFF_Y},
+                            left: Math.floor(background.meta.width / 2 - winOfFirst.meta.width / 2) - headConst.distanceFromCenterX, 
+                            top: Math.floor(background.meta.height / 2 +  winOfFirst.meta.height / 2) + headConst.distanceFromCenterY},
                         {   input: await draw.sharp.toBuffer(), 
                             left: Math.floor(background.meta.width / 2 - draw.meta.width / 2), 
-                            top: Math.floor(background.meta.height / 2 + draw.meta.height / 2) + MARGIN_COEFF_Y},
+                            top: Math.floor(background.meta.height / 2 + draw.meta.height / 2) + headConst.distanceFromCenterY},
                         {   input: await winOfSecond.sharp.toBuffer(), 
-                            left: Math.floor(background.meta.width / 2 - winOfSecond.meta.width / 2) + headConst.distanceFromCenter, 
-                            top: Math.floor(background.meta.height / 2 + winOfSecond.meta.height / 2) + MARGIN_COEFF_Y}];
+                            left: Math.floor(background.meta.width / 2 - winOfSecond.meta.width / 2) + headConst.distanceFromCenterX, 
+                            top: Math.floor(background.meta.height / 2 + winOfSecond.meta.height / 2) + headConst.distanceFromCenterY}];
 
     console.log(composition);
     return await background.sharp.composite(composition).png().toBuffer(); //вызываем метод у картинки бэкграунда, т.к. метод накладывает составные части поверх картинки, на которой он вызывается

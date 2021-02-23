@@ -3,12 +3,12 @@
         <form :class="{'non-border': isLoading}" :style="{borderWidth: `${borderWidthVariable}px`}" @submit="responseHeadImage">
             <input v-model="eventLineUrl" type="url" placeholder="ссылка на линию">
             <button @click="sendURL">
-                <img src="../../assets/play.svg" alt="Го">
+                <img src="../../../assets/play.svg" alt="Го">
             </button>
             <transition name='loadbar'>
                 <div v-if="isLoading" class="load-bar">
                     <p>Взлымываем olimp.bet</p>
-                    <img class="loading-image" src="../../assets/loading-arrows.svg" alt="loading">
+                    <img class="loading-image" src="../../../assets/loading-arrows.svg" alt="loading">
                 </div>
             </transition>
         </form>

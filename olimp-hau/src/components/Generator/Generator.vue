@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import urlForm from './urlForm.vue'
-import logoLoader from './logoLoader.vue'
+import urlForm from './parts/urlForm.vue'
+import logoLoader from './parts/logoLoader/logoLoader.vue'
 export default {
   data(){
     return {

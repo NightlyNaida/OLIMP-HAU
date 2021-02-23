@@ -18,13 +18,14 @@ async function getDataFromServerInObjectFunction(url){
 function convertContentTypeToSortVersion(contentType){
     if (/image\/png/gm.test(contentType)) return 'png';
     if (/application\/json/gm.test(contentType)) return 'json';
+    if (/text\/pain/gm.test(contentType)) return 'text';
     return null;
 }
 
 async function getCompositionParametesFunction(){
     let data = await getDataFromServerInObjectFunction('http://127.0.0.1:3030/headParam');
     if (data.shortContentType == 'json'){
-        let textJSON = await data.text();
+        let textJSON = await data.response.text();
         let json = JSON.parse(textJSON);
         return json;
     }
