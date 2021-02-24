@@ -6,12 +6,7 @@
         class="image-container-scale"
         :style="imageContainerScaleStyle"
       >
-        <!-- <img class="image-container-scale__logo" :src='activeTeam.file.name' alt=""> -->
-        <div
-          ref="logo"
-          :style="logoStyle"
-          class="image-container-scale__logo"
-        ></div>
+        <img ref="logo" :style="logoStyle" class="image-container-scale__logo" :src="logoURL" alt="">
         <img
           :src="backgroundImageURL"
           alt="Не удалось загрузить изображение шапки"
@@ -31,7 +26,7 @@
         </button>
         <button
           data-value="10"
-          @click="psoitonLogo"
+          @click="buttonScaleControllerClick"
           class="imageScaleController__button-plus imageScaleController__button"
         >
           <img
@@ -57,15 +52,16 @@ const width = 3180;
 const height = 800;
 import workWithServer from "../../../workWithServer.js";
 export default {
-  props: ["scale"],
+  props: ["scale","logo"],
   data() {
     return {
+      logoSrc: "",
       scaleOfComposition: 20,
       backgroundImageURL: "",
       isLoadingImage: false,
       logoParameters: {
-        distanceFromCenterX: 0,
-        distanceFromCenterY: 0,
+        logoDistanceFromCenterX: 0,
+        logoDistanceFromCenterY: 0,
       },
     };
   },
@@ -82,18 +78,14 @@ export default {
     buttonScaleControllerClick(e) {
       this.changeScaleOfComposition(parseInt(e.currentTarget.dataset.value));
     },
-    psoitonLogo() {
-      let style = getComputedStyle(this.$refs.logo);
-      let left =
-        width / 2 -
-        this.logoParameters.distanceFromCenterX -
-        parseInt(style.width);
-      let top =
-        height / 2 -
-        this.logoParameters.distanceFromCenterY -
-        parseInt(style.height);
-      this.$refs.logo.style.left = `${left}px`;
-      this.$refs.logo.style.top = `${top}px`;
+    positonLogo() {  
+      if (this.backgroundImageURL.length > 1) {
+        let style = getComputedStyle(this.$refs.logo);
+        let left = width / 2 + this.logoParameters.logoDistanceFromCenterX - parseInt(style.width) / 2;
+        let top = height / 2 + this.logoParameters.logoDistanceFromCenterY - parseInt(style.height) / 2;
+        this.$refs.logo.style.left = `${left}px`;
+        this.$refs.logo.style.top = `${top}px`;
+      }
     },
   },
   computed: {
@@ -107,6 +99,15 @@ export default {
     logoStyle() {
       return { transform: `scale(${this.scale / 100})` };
     },
+    logoURL(){
+      if (this.logo){
+        let url = URL.createObjectURL(this.logo);
+        return url;
+      }
+      else{
+        return 'https://storage.mds.yandex.net/get-sport/12778/015847d428f8997ab099c7d749aa0e5a.png';
+      }
+    }
   },
   mounted() {
     this.isLoadingImage = true;
@@ -124,11 +125,13 @@ export default {
       });
 
     workWithServer.getCompositionParametes().then((param) => {
-      proxy.logoParameters.distanceFromCenterX = param.distanceFromCenterX;
-      proxy.logoParameters.distanceFromCenterY = param.distanceFromCenterY;
-      //proxy.psoitonLogo();
+      proxy.logoParameters.logoDistanceFromCenterX = param.logoDistanceFromCenterX;
+      proxy.logoParameters.logoDistanceFromCenterY = param.logoDistanceFromCenterY;
     });
   },
+  updated(){
+    this.positonLogo();
+  }
 };
 </script>
 
@@ -205,8 +208,8 @@ export default {
     animation-timing-function linear
 
   .image-container-scale__logo
-    width 300px
-    height 300px
+    max-width 300px
+    max-height 300px
     position: absolute;
     background-color black
 

@@ -16,7 +16,7 @@
           <img src="../../../../assets/Ok.svg" alt="">
         </button>
       </div>
-      <image-constructor :scale="logoScaleValue"></image-constructor>
+      <image-constructor :logo="logo" :scale="logoScaleValue"></image-constructor>
   </div>
 </template>
 
@@ -32,22 +32,22 @@ export default {
       logoScaleValue: 100,
     }
   },
-  props: ['teams'],
-  events: ['logo-load'],
+  props: ['teams','logo'],
+  events: ['logo-load','change-active-team'],
   methods:{
     buttonClick(e){
       this.changeMarkerPosition(e.target.dataset.pkey);
     },
     changeMarkerPosition(buttonId){
+      this.$emit('change-active-team',buttonId);
       this.$refs['button-' + this.markerPositionId].classList.remove('button-selected');
       this.markerPositionId = buttonId;
       this.$refs['button-' + buttonId].classList.add('button-selected');
       this.$refs[`marker`].style.left = (this.$refs['button-' + buttonId].getBoundingClientRect().left - 70) + 'px';
     },
     inputFileChange(e){
-      console.log(this.markerPositionId);
       if(e.target.files[0]){
-        this.$emit('logo-load',{file: e.target.files[0], name: this.markerPositionId});
+        this.$emit('logo-load', e.target.files[0]);
       }
     },
     changeRangeValue(value){

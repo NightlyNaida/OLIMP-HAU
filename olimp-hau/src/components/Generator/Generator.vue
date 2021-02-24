@@ -1,7 +1,7 @@
 <template>
  <div class="container">
     <url-form @team-without-logo="addNewTeam" class="url-form"></url-form>
-    <logo-loader @logo-load="addNewLogoToTeam" v-if="Object.keys(teamsNeedForLogo).length > 1" :teams="teamsNeedForLogo"></logo-loader>
+    <logo-loader :logo-file="takeImageFromTeam" @change-active-team="changeActiveTeam" @logo-load="addNewLogoToTeam" v-if="Object.keys(teamsNeedForLogo).length > 1" :teams="teamsNeedForLogo"></logo-loader>
  </div>
 </template>
 
@@ -11,20 +11,31 @@ import logoLoader from './parts/logoLoader/logoLoader.vue'
 export default {
   data(){
     return {
-      teamsNeedForLogo: {}
+      teamsNeedForLogo: {},
+      activeTeam: '',
     }
   },
   components: { urlForm, logoLoader },
   methods:{
     addNewTeam(team){
-      this.teamsNeedForLogo[team] = {isLoaded: false};
+      this.teamsNeedForLogo[team] = {};
+      this.teamsNeedForLogo[team]['file'] = '';  
     },
-    addNewLogoToTeam(teamData){
-      this.teamsNeedForLogo[teamData.name].file = teamData.file;
+    addNewLogoToTeam(file){
+      this.teamsNeedForLogo[this.activeTeam].file = file;
       console.log(this.teamsNeedForLogo);
     },
     deleteTeam(key){
       this.teamsNeedForLogo.splice(key,1)
+    },
+    changeActiveTeam(team){
+      this.activeTeam = team;
+      console.log(this.activeTeam);
+    },
+    takeImageFromTeam(){
+      if (this.teamsNeedForLogo[this.activeTeam].file){
+        return this.teamsNeedForLogo[this.activeTeam].file;
+      }
     }
   }
 }

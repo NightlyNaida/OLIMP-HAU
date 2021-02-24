@@ -1,4 +1,5 @@
 module.exports = {
-    distanceFromCenterX: 400,
-    distanceFromCenterY: -70
+    logoDistanceFromCenterX: 400,
+    logoDistanceFromCenterY: -70,
+    coefficientDistanceFromCenterY: 140
 }
