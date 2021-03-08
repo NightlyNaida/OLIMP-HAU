@@ -16,4 +16,4 @@ module.exports = async (form) => {
     console.log('write JSON File...');
     await workWithFiles.writeFile(PATH_TO_WRITE_JSON,JSON.stringify(logos)).catch(err => {throw new Error(err)});
     return true;
-}       
+}   

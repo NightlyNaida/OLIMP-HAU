@@ -16,7 +16,6 @@ const FONT_PATH = './fonts/Intro-Black.otf';
 
 let expFunc = async function(matchObj){
     console.log('create image file');
-    console.log('match object',matchObj);
 
     let firstTeamParam = iconPath[matchObj.firstTeam]; //получаем параметры логотипов команд
     let secondTeamParam = iconPath[matchObj.secondTeam];
@@ -33,13 +32,13 @@ let expFunc = async function(matchObj){
     let firstTeamImage = sharp(LOGO_PATH + firstTeamParam.name);
     let secondTeamImage = sharp(LOGO_PATH + secondTeamParam.name);
 
-    let winOfFirst = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents['Победа первой']))};
+    let winOfFirst = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[0]))};
     winOfFirst.meta = await winOfFirst.sharp.metadata();
 
-    let draw = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[`Ничья`]))};
+    let draw = {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[1]))};
     draw.meta = await draw.sharp.metadata();
 
-    let winOfSecond= {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents['Победа второй']))};
+    let winOfSecond= {sharp: sharp(generateImageOfCoefficent(matchObj.coefficents[2]))};
     winOfSecond.meta = await winOfSecond.sharp.metadata();
        console.log(`Generate composition...`);
 

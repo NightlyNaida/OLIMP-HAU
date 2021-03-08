@@ -6,9 +6,7 @@
         class="image-container-scale"
         :style="imageContainerScaleStyle"
       >
-        <div class="image-container-line image-container-line-top"></div>
-        <div class="image-container-line image-container-line-bottom"></div>
-        <img ref="logo" @load="positonLogo" :src="activeTeamLogoParameters.url" :style="logoStyle" class="image-container-scale__logo" alt="">
+        <img ref="logo" :style="logoStyle" class="image-container-scale__logo" :src="logoURL" alt="">
         <img
           :src="backgroundImageURL"
           alt="Не удалось загрузить изображение шапки"
@@ -54,10 +52,10 @@ const width = 3180;
 const height = 800;
 import workWithServer from "../../../workWithServer.js";
 export default {
-  emits: ['logo-size'],
-  props: ["scale", "activeTeamLogoParameters"],
+  props: ["scale","logo"],
   data() {
     return {
+      logoSrc: "",
       scaleOfComposition: 20,
       backgroundImageURL: "",
       isLoadingImage: false,
@@ -87,16 +85,8 @@ export default {
         let top = height / 2 + this.logoParameters.logoDistanceFromCenterY - parseInt(style.height) / 2;
         this.$refs.logo.style.left = `${left}px`;
         this.$refs.logo.style.top = `${top}px`;
-        this.notifyAboutLogoSizeChange();
       }
     },
-    notifyAboutLogoSizeChange(){
-      if(this.$refs['logo']){
-        let logoStyle = getComputedStyle(this.$refs['logo']);
-        let size = {width: parseInt(logoStyle.width), height: parseInt(logoStyle.height)};
-        this.$emit('logo-size',size);
-      }
-    }
   },
   computed: {
     imageContainerScaleStyle() {
@@ -107,8 +97,17 @@ export default {
       };
     },
     logoStyle() {
-      return { transform: `scale(${this.activeTeamLogoParameters.scale / 100})` };
+      return { transform: `scale(${this.scale / 100})` };
     },
+    logoURL(){
+      if (this.logo){
+        let url = URL.createObjectURL(this.logo);
+        return url;
+      }
+      else{
+        return 'https://storage.mds.yandex.net/get-sport/12778/015847d428f8997ab099c7d749aa0e5a.png';
+      }
+    }
   },
   mounted() {
     this.isLoadingImage = true;
@@ -130,6 +129,9 @@ export default {
       proxy.logoParameters.logoDistanceFromCenterY = param.logoDistanceFromCenterY;
     });
   },
+  updated(){
+    this.positonLogo();
+  }
 };
 </script>
 
@@ -139,19 +141,15 @@ export default {
     overflow hidden
     position: relative
     border-radius 30px
-    background-color rgba(157,157,157,0.3)
-    box-shadow 0px 4px 17px 10px rgba(0, 0, 0, 0.25)
-    display flex
-    justify-content center
-    align-items center
 
 
 .image-container, .image-not-loaded, .image-loading
+    background-color rgba(157,157,157,0.3)
     display flex
     flex-direction column
     justify-content center
     align-items center
-
+    box-shadow 0px 4px 17px 10px rgba(0, 0, 0, 0.25)
     position relative
     max-width 100%
     max-height 100%
@@ -212,8 +210,8 @@ export default {
   .image-container-scale__logo
     max-width 300px
     max-height 300px
-    height: 300px;
     position: absolute;
+    background-color black
 
   @keyframes rotate
       0%

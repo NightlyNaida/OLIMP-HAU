@@ -1,6 +1,5 @@
 <template>
   <div class="logo-lodaer-container">
-      <h2 class="logo-loader-caption">Загрузите логотипы командам:</h2>
       <div class="switcher">
         <button class="button-switch" :ref="'button-' + index" @click="buttonClick" v-for="(team,index) in teams" :data-pkey="index" :key="index">{{index}}</button>
         <div ref="marker" class="indicator"></div>
@@ -11,13 +10,13 @@
           <p>Файл</p>
           <img src="../../../../assets/document.svg" alt="">
         </label>
-        <range v-if="isLogoLoaded" @value-change="changeRangeValue" :max="200" :min="20" :default-value="100"></range>
-        <button @click="sendLogo" v-if="isLogoLoaded" class="button-logo-ready">
+        <range @value-change="changeRangeValue" :max="200" :min="20" :default-value="100"></range>
+        <button class="button-logo-ready">
           <p>Загрузить</p>
           <img src="../../../../assets/Ok.svg" alt="">
         </button>
       </div>
-      <image-constructor @logo-size="logoSize" v-if="isLogoLoaded" :active-team-logo-parameters="activeTeamLogoParameters"></image-constructor>
+      <image-constructor :logo="logo" :scale="logoScaleValue"></image-constructor>
   </div>
 </template>
 
@@ -33,23 +32,17 @@ export default {
       logoScaleValue: 100,
     }
   },
-  props: ['teams','activeTeamLogoParameters'],
-  events: ['logo-size','logo-load','change-active-team','change-scale','send-logo'],
+  props: ['teams','logo'],
+  events: ['logo-load','change-active-team'],
   methods:{
     buttonClick(e){
       this.changeMarkerPosition(e.target.dataset.pkey);
     },
     changeMarkerPosition(buttonId){
       this.$emit('change-active-team',buttonId);
-      this.$refs['button-' + this.markerPositionId].classList.remove('button-switch-selected');
-
+      this.$refs['button-' + this.markerPositionId].classList.remove('button-selected');
       this.markerPositionId = buttonId;
-      if(this.$refs['button-' + buttonId].classList.contains('button-switch-loaded')){
-        this.$refs
-      }
-      else{
-        this.$refs['button-' + buttonId].classList.add('button-switch-selected');
-      }
+      this.$refs['button-' + buttonId].classList.add('button-selected');
       this.$refs[`marker`].style.left = (this.$refs['button-' + buttonId].getBoundingClientRect().left - 70) + 'px';
     },
     inputFileChange(e){
@@ -58,23 +51,7 @@ export default {
       }
     },
     changeRangeValue(value){
-      this.$emit('change-scale',value);
-    },
-    sendLogo(){
-      this.$emit('send-logo')
-    },
-    logoSize(size){
-      this.$emit('logo-size',size);
-    }
-  },
-  computed:{
-    isLogoLoaded(){
-      if (this.activeTeamLogoParameters.url && this.activeTeamLogoParameters.url.length > 0){
-        return true;
-      }
-      else{
-        return false;
-      }
+      this.logoScaleValue = value;
     }
   },
   mounted(){
@@ -89,18 +66,11 @@ export default {
 <style lang="stylus" scoped>
   .logo-lodaer-container
     display grid
-    grid-template-columns calc((100vw - 140px) / 2) calc((100vw - 140px) / 2)
-    grid-template-rows 40px 30px 300px
+    grid-template-columns 1fr 1fr
+    grid-template-rows 30px 300px
     grid-gap 30px 
-    grid-template-areas  "caption caption"\
-                         "switcher controller"\
+    grid-template-areas  "switcher controller"\
                          "preview preview"
-
-  .logo-loader-caption
-    grid-area caption
-    color #fff
-    font-size 25px
-    margin 0
 
   .switcher
     display grid
@@ -122,15 +92,11 @@ export default {
     overflow hidden
     text-overflow ellipsis
 
-  .button-switch-loaded
-    background-color rgba(43,168,74,0.5)
-
-
   .button-switch:hover
     border-color rgba(255,255,255,0.3)
     cursor pointer
 
-  .button-switch-selected
+  .button-selected
     color #6C1010
     font-weight 600
 
