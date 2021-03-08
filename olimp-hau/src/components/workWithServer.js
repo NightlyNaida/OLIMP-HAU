@@ -1,15 +1,22 @@
 let obj = {
     getDataFromServerInObject: getDataFromServerInObjectFunction,
     getCompositionParametes: getCompositionParametesFunction,
-    getBackgroundImage: getBackgroundImageFunction
+    getBackgroundImage: getBackgroundImageFunction,
+    sendLogo: sendLogoFunction,
 }
 
 async function getDataFromServerInObjectFunction(url){
     let responseFromServer = await fetch(url);
     let contentType = responseFromServer.headers.get('Content-Type');
     let shortContentType = convertContentTypeToSortVersion(contentType);
+    let data; 
+    switch(shortContentType){
+        case 'png': data = await responseFromServer.blob(); break;
+        case 'json': data = await responseFromServer.text(); break;
+        case 'text': data = await responseFromServer.text(); break;
+    }
 
-    let finalyObject = {'response': responseFromServer, 'contentType': contentType, 'shortContentType': shortContentType};
+    let finalyObject = {'response': responseFromServer, 'contentType': contentType, 'shortContentType': shortContentType, 'data': data};
 
     return finalyObject;
 
@@ -39,6 +46,11 @@ async function getBackgroundImageFunction(){
         let src = URL.createObjectURL(imageBlob);
         return src;  
     }
+}
+
+async function sendLogoFunction(formData){
+    let response = await fetch('http://127.0.0.1:3030/sendLogo',{method: 'POST',body: formData});
+    return response;
 }
 
 export default obj
