@@ -22,6 +22,6 @@
   "description": "",
   "devDependencies": {
     "formidable": "^1.2.2",
-    "ws": "^7.3.1"
+    "ws": "^7.4.6"
   }
 }
